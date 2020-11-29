@@ -1,0 +1,80 @@
+-- auto-generated definition
+create table home
+(
+    user_id int          not null
+        primary key,
+    F_name  varchar(250) null,
+    L_name  varchar(250) null
+);
+
+-- auto-generated definition
+create table rooms
+(
+    room_id int not null
+        primary key,
+    user_id int null,
+        foreign key (user_id) references home (user_id)
+);
+
+-- auto-generated definition
+create table actuator
+(
+    actuator_id int          null,
+    device_id   int          null,
+    brand       varchar(250) null,
+    type        varchar(250) null,
+    constraint actuator_ibfk_1
+        foreign key (device_id) references device (device_id)
+);
+
+-- auto-generated definition
+create table changes
+(
+    user_id   int      not null,
+    device_id int      not null,
+    room_id   int      null,
+    value     int      not null,
+    date      datetime null,
+    primary key (user_id, device_id),
+        foreign key (user_id) references rooms (user_id),
+        foreign key (room_id) references rooms (room_id),
+        foreign key (device_id) references device (device_id)
+);
+
+-- auto-generated definition
+create table data
+(
+    data_id    int auto_increment,
+    device_id  int      not null,
+    sensor_id int      not null,
+    value     int      null,
+    time      datetime null,
+    primary key (data_id,device_id, sensor_id),
+    constraint data_ibfk_1
+        foreign key (sensor_id) references sensor (sensor_id),
+        foreign key (device_id) references device (device_id)
+);
+
+-- auto-generated definition
+create table device
+(
+    device_id int not null
+        primary key,
+    room_id   int null,
+    constraint device_ibfk_1
+        foreign key (room_id) references rooms (room_id)
+);
+
+-- auto-generated definition
+create table sensor
+(
+    sensor_id int          not null
+        primary key,
+    device_id int          null,
+    brand     varchar(250) null,
+    type      varchar(250) null,
+    constraint sensor_ibfk_1
+        foreign key (device_id) references device (device_id)
+);
+
+
