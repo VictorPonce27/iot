@@ -27,21 +27,12 @@ def light_switch(value, device):
         mycursor.execute("SELECT user_id from home")
         check_user  = mycursor.fetchall()
         if(user = check_user): 
-            dicSalida = {'user': i,'acction': 1}
+            dicSalida = {'user': check_user,'acction': 1}
             salidaJson = json.dumps(dicSalida)
             print("you have turned the lights on from device: " + device)
             client.publish("tc1004b/g6/control", salidaJson)
-            
     else:
-        dicSalida = {'acction': 1}
-        salidaJson = json.dumps(dicSalida)
-        print('Salida Json:', salidaJson)
-        client.publish("tc1004b/g6/control", salidaJson)
-
-
-
-
-
+        print("no action will be taken")
 
 # Callback Function on Connection with MQTT Server
 def on_connect(client, userdata, flags, rc):
