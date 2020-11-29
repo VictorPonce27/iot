@@ -2,31 +2,55 @@ import mysql.connector as mysql
 import time
 import paho.mqtt.client as mqtt
 import json 
-from datetime   import datetime 
-#*local variables 
-
-now = datetime.now()
-current_time = now.strftime("%H:$M:%S")
+from datetime   import datetime as dt 
+from datetime import timedelta 
+#!local variables 
+#* current time variable
+current_time = (dt.now() - timedelta(1)).strftime('%Y-%m-%d %H:%M:%S.%f')
 
 #*  connection to databse
 db = mysql.connect(host="localhost", user="root", passwd="root",database = "iot")
 
 #* create obect with A.K.A MySQL    
 mycursor = db.cursor() 
-# mycursor.execute("INSERT INTO Home(user_id, F_name, L_name) VALUE (%s, %s, %S)", (1,"Victor","Ponce"))
-# mycursor.commit()
+
+#function to turn lights on in the IoT
+def light_switch(value, device):
+    print("the device:" + device + "has a value of: " +
+          value + "What would you like to do")
+    choice = input("Would you like to turn on[Y/N]")
+    while(choice.upper() != Y or N):
+        print("please type a valid answer")
+        choice = input("Would you like to turn on[Y/N]")
+    if(choice.upper() == Y):
+        user = input("what is your user_id")
+        mycursor.execute("SELECT user_id from home")
+        check_user  = mycursor.fetchall()
+        if(user = check_user): 
+            dicSalida = {'user': i,'acction': 1}
+            salidaJson = json.dumps(dicSalida)
+            print("you have turned the lights on from device: " + device)
+            client.publish("tc1004b/g6/control", salidaJson)
+            
+    else:
+        dicSalida = {'acction': 1}
+        salidaJson = json.dumps(dicSalida)
+        print('Salida Json:', salidaJson)
+        client.publish("tc1004b/g6/control", salidaJson)
+
+
+
+
 
 
 # Callback Function on Connection with MQTT Server
-# Callback Function on Connection with MQTT Server
-# Función Callback que se ejecuta cuando se conectó con el servidor MQTT
-
 def on_connect(client, userdata, flags, rc):
     print("Connected with Code :" + str(rc))
     # Subscribe Topic from here
     # Aprovechando que se conectó, hacemos un subscribe a los tópicos
     #client.subscribe("fjhp6619mxIn")
     client.subscribe("tc1004b/g6")
+    client.subscribe("tc1004b/g6/control")
 
 # Callback Function on Receiving the Subscribed Topic/Message
 # Cuando nos llega un mensaje a los tópicos suscritos, se ejecuta
@@ -46,41 +70,16 @@ def on_message(client, userdata, msg):
 # Para Debug: iprimimos lo que generamos
 # Aquí es donde podemos almacenar en la BD la información
 # que envía el dispositivo
-    # print()
-    # print('------------Llegada de mensaje-----------')
-    # print('Tópico: ', topic)
-    # print(type(m_decode), ' ', m_decode)
-    # print(type(m_in), ' ', m_in)
-    # print('Dispositivo: ', type(m_in['dispositivo']), ' ', m_in['dispositivo'])
-    # print('       Tipo: ', type(m_in['tipo']), ' ', m_in['tipo'])
-    # print('       Dato: ', type(m_in['dato']), ' ', m_in['dato'])
-    # print()
-    # print('------------Llegada de mensaje-----------')
-    # print('Tópico: ', topic)
-    # print(type(m_decode), ' ', m_decode)
-    # print(type(m_in), ' ', m_in)
-    # print('  dato_id', type(m_in['dato'],' ')m_in['dato'])
-    # print('sensor_id', type(m_in['sensor']),' ', m_in['sensor'])
-    # print('    valor', type(m_in['valor']),' ', m_in['valor'])
-    # print('time'+ current_time)
-    # print('\ntesting')
-    # TODO: jason works, need to implement to the data base and test
-    # dato_id = (type(m_in['dato']),' ', m_in['dato'])
+    device_id = m_in['device']
     sensor_id = m_in['sensor']
     valor = m_in['valor']
-    # print(dato_id)
-    print(sensor_id)
-    print(valor)
-    number = 1;     
 
-    # mycursor.execute("INSERT INTO datos(datos_id, ) VALUE (%s, %s)", (valor, current_time))
-    # mycursor.execute("INSERT INTO datos(sensor_id, valor, time ,datos_id) VALUE (%s,%s,%s)",(sensor_id,valor,current_time))
-    mycursor.execute("INSERT INTO datos(datos_id, sensor_id, valor, time) VALUE (%s,%s,%s)",(number,sensor_id,valor,current_time))
+    #!sends data from nodeMCU to mysql 
+    mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
+    db.commit()
+    
 
-    mycursor.commit()
-    # print ("Recibido--->", str(msg.payload) )
-
-# En esta función pedimos datos al usuario para saber a qué
+# En esta función pedimos datos al usuario para saber a qué 
 # dispositivo vamos a enviar el mensaje y lo formatemos a json
 
 
