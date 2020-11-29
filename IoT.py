@@ -71,9 +71,12 @@ def on_message(client, userdata, msg):
     # print(dato_id)
     print(sensor_id)
     print(valor)
-    
+    number = 1;     
 
-    mycursor.execute("INSERT INTO datos(valor, time) VALUE (%s, %s)", (valor, current_time))
+    # mycursor.execute("INSERT INTO datos(datos_id, ) VALUE (%s, %s)", (valor, current_time))
+    # mycursor.execute("INSERT INTO datos(sensor_id, valor, time ,datos_id) VALUE (%s,%s,%s)",(sensor_id,valor,current_time))
+    mycursor.execute("INSERT INTO datos(datos_id, sensor_id, valor, time) VALUE (%s,%s,%s)",(number,sensor_id,valor,current_time))
+
     mycursor.commit()
     # print ("Recibido--->", str(msg.payload) )
 
