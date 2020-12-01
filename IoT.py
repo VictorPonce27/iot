@@ -5,9 +5,6 @@ import json
 from datetime   import datetime as dt 
 from datetime import timedelta 
 #!local variables 
-#* current time variable
-current_time = (dt.now() - timedelta(1)).strftime('%Y-%m-%d %H:%M:%S.%f')
-
 #*  connection to databse
 db = mysql.connect(host="localhost", user="root", passwd="root",database = "iot")
 
@@ -26,7 +23,7 @@ def light_switch(value, device):
         user = input("what is your user_id")
         mycursor.execute("SELECT user_id from home")
         check_user  = mycursor.fetchall()
-        if(user = check_user): 
+        if(user == check_user): 
             dicSalida = {'user': check_user,'acction': 1}
             salidaJson = json.dumps(dicSalida)
             print("you have turned the lights on from device: " + device)
@@ -52,13 +49,16 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
+
     # print the message received from the subscribed topic
+    #* current time variable
+    current_time = (dt.now() - timedelta(1)).strftime('%Y-%m-%d %H:%M:%S.%f')
     topic = msg.topic
     m_decode = str(msg.payload.decode("utf-8", "ignore"))
     m_in = json.loads(m_decode)
 
 # Checar si el tópico es el que deseamos
-# Para Debug: iprimimos lo que generamos
+# Para Debug: iprimimos lo que generamosdata
 # Aquí es donde podemos almacenar en la BD la información
 # que envía el dispositivo
     device_id = m_in['device']
