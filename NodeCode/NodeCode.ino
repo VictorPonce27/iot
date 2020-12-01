@@ -23,8 +23,8 @@ const char* ssid = "INFINITUME7A2_2.4";
 const char* password = "Z4M8b75pS8";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 const char* topico_salida = "tc1004b/g6";
-const char* topico_entrada = "tc1004b/g6";
-const char* topico_control =  "tc1004b/g6/control/"
+
+const char* topico =  "tc1004b/g6/control/"
 
 
 WiFiClient espClient;
@@ -77,7 +77,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   digitalWrite(D5, LOW);
 
                               // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
+  if ((char)payload[0] == '1' && (char)payload[1] == '2') {
     digitalWrite(D6, HIGH);   // Turn the LED on (Note that LOW is the voltage level
                               // but actually the LED is on; this is because
                               // it is active low on the ESP-01). No es cierto en D6.
@@ -93,19 +93,16 @@ void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    // Create a random client ID
+
     String clientId = "ESP8266Client-";
     clientId += String(random(0xffff), HEX);
-    // Attempt to connect
+
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
-      // Once connected, publish an announcement...
-      //client.publish("outTopic", "hello world");
+
       client.subscribe(topico_entrada);
- //     client.subscribe(topico_salida);
       client.publish(topico_salida, "hello world");      
-      // ... and resubscribe
-      //client.subscribe("inTopic");
+
      
     } else {
       Serial.print("failed, rc=");
@@ -154,13 +151,11 @@ void proceso1() {
   float t = dht.readTemperature();
   Serial.print("Temperatura: "); 
   Serial.println(t);
-//  snprintf (msg, MSG_BUFFER_SIZE, "{\"dispositivo\":\"IoT_1\",\"tipo\":\"temperatura\",\"dato\":%.2f}", t);
-//    snprintf (msg, MSG_BUFFER_SIZE, "{\"dato\":\"%.i\",\"sensor\":\"%.i\",\"valor\":%.2f}",count, sensor_id, t);
+
     snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, t);
-//  Serial.print("Publish message: ");
+
   Serial.println(msg);
-//  client.publish(topico_salida, msg);
-  client.publish(topico_entrada, msg);   
+  client.publish(topico_salida, msg);   
 }
 
 void proceso2() {
@@ -173,42 +168,27 @@ void proceso2() {
   else{
     digitalWrite(D2,LOW); 
   }
-  
-//  Serial.print("luminocidad: "); 
-//  Serial.println(analog_in); 
- 
-//  analogWrite(D1, analog_in/4);
-//    snprintf (msg, MSG_BUFFER_SIZE, "{\"dispositivo\":\"IoT_1\",\"tipo\":\"lumi\",\"dato\":%d}", ((1024-analog_in)*100)/(1024-50));
+
     snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%d}",sensor_id, ((1024-analog_in)*100)/(1024-50));
-//  Serial.print("Publish message: ");
+
   Serial.println(msg);
-//  client.publish(topico_salida, msg);
+
   client.publish(topico_entrada, msg);                                   
 }
 
 void proceso3() {
 //  int count = 1; 
   timeClient.update();
-//  String formattedTime = timeClient.getFormattedTime();
-//  unsigned long epochTime = timeClient.getEpochTime();
-//  Serial.print(formattedTime);
-//  Serial.print(" ");
-//  Serial.println(epochTime);   
-
 }
 
 
 void proceso4() {
   int sensor_id = 3; 
   float h = dht.readHumidity();
-//  Serial.print("Humedad: "); 
-//  Serial.println(h);
-//  Serial.println(D3); 
   snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, h);
-//  Serial.print("Publish message: ");
+
   Serial.println(msg);
-//  client.publish(topico_salida, msg);
-  client.publish(topico_entrada, msg);   
+  client.publish(topico_salida, msg);   
 }
   
 
