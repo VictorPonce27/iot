@@ -12,24 +12,24 @@ db = mysql.connect(host="localhost", user="root", passwd="root",database = "iot"
 mycursor = db.cursor() 
 
 #function to turn lights on in the IoT
-def light_switch(value, device):
-    print("the device:" + device + "has a value of: " +
-          value + "What would you like to do")
-    choice = input("Would you like to turn on[Y/N]")
-    while(choice.upper() != Y or N):
-        print("please type a valid answer")
-        choice = input("Would you like to turn on[Y/N]")
-    if(choice.upper() == Y):
-        user = input("what is your user_id")
-        mycursor.execute("SELECT user_id from home")
-        check_user  = mycursor.fetchall()
-        if(user == check_user): 
-            dicSalida = {'user': check_user,'acction': 1}
-            salidaJson = json.dumps(dicSalida)
-            print("you have turned the lights on from device: " + device)
-            client.publish("tc1004b/g6/control", salidaJson)
-    else:
-        print("no action will be taken")
+# def light_switch(value, device):
+#     print("the device:" + device + "has a value of: " +
+#           value + "What would you like to do")
+#     choice = input("Would you like to turn on[Y/N]")
+#     while(choice.upper() != Y or N):
+#         print("please type a valid answer")
+#         choice = input("Would you like to turn on[Y/N]")
+#     if(choice.upper() == Y):
+#         user = input("what is your user_id")
+#         mycursor.execute("SELECT user_id from home")
+#         check_user  = mycursor.fetchall()
+#         if(user == check_user): 
+#             dicSalida = {'user': check_user,'acction': 1}
+#             salidaJson = json.dumps(dicSalida)
+#             print("you have turned the lights on from device: " + device)
+#             client.publish("tc1004b/g6/control", salidaJson)
+#     else:
+#         print("no action will be taken")
 
 # Callback Function on Connection with MQTT Server
 def on_connect(client, userdata, flags, rc):
@@ -69,7 +69,6 @@ def on_message(client, userdata, msg):
     mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
     db.commit()
     
-
 # En esta función pedimos datos al usuario para saber a qué 
 # dispositivo vamos a enviar el mensaje y lo formatemos a json
 
@@ -77,14 +76,15 @@ def on_message(client, userdata, msg):
 def envia_dispositivo():
     dispositivo = input('Nombre del dispositivo:')
     sensor_actuador = input('Sensor del dispositivo:')
-    accion = int(input('Acción:'))
+    # accion = int(input('Acción:'))
     dicSalida = {'dispositivo': dispositivo,
-                 'tipo': sensor_actuador, 'dato': accion}
+                 'tipo': sensor_actuador}
     salidaJson = json.dumps(dicSalida)
     print('Salida Json:', salidaJson)
     client.publish("tc1004b/g6", salidaJson)
     #time.sleep(4)
-    #client.publish("fjhp6619mxIn",salidaJson)
+
+    # #client.publish("fjhp6619mxIn",salidaJson)
 
 # Envía un mensaje de prueba para que se procese en la llegada de mensajes
 
