@@ -24,7 +24,7 @@ const char* password = "Z4M8b75pS8";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 const char* topico_salida = "tc1004b/g6";
 
-const char* topico =  "tc1004b/g6/control/"
+const char* topico =  "tc1004b/g6/control/";
 
 
 WiFiClient espClient;
@@ -100,8 +100,8 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
 
-      client.subscribe(topico_entrada);
-      client.publish(topico_salida, "hello world");      
+      client.subscribe(topico_salida);
+//      client.publish(topico_salida, "hello world");      
 
      
     } else {
@@ -173,7 +173,7 @@ void proceso2() {
 
   Serial.println(msg);
 
-  client.publish(topico_entrada, msg);                                   
+  client.publish(topico_salida, msg);                                   
 }
 
 void proceso3() {
