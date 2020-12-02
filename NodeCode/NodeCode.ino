@@ -84,17 +84,17 @@ void callback(char* topico, byte* payload, unsigned int length) {
                               // Switch on the LED if an 1 was received as first character
   if (disp == '1' && sens == '2' && state == '1') {
     Serial.print("turned on");
-    digitalWrite(D6, LOW);   // Turn the LED on (Note that LOW is the voltage level
-                              // but actually the LED is on; this is because
-                              // it is active low on the ESP-01). No es cierto en D6.
+    digitalWrite(D6, LOW);  
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"value\":%.i,\"user\":%.i,\"action\":\"2\"}",sens,state,user);
+    client.publish(topico_salida, msg); 
+    
   } else if (disp == '1' && sens == '2' && state == '2'){
     Serial.print("turned off");
     digitalWrite(D6, HIGH);    // Turn the LED off by making the voltage HIGH
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"value\":%.i,\"user\":%.i,\"action\":\"2\"}",sens,state,user);
+    client.publish(topico_salida, msg); 
   }
-  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"state\":%.i,\"user\":%.i,\"action\":\"2\"}",sens,state,user);
-
-//  Serial.println(msg);
-  client.publish(topico_salida, msg);   
+  //  Serial.println(msg);
 }
 
 
