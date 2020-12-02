@@ -6,7 +6,7 @@ from datetime   import datetime as dt
 from datetime import timedelta 
 #!local variables 
 #*  connection to databse
-db = mysql.connect(host="localhost", user="root", passwd="root",database = "iot")
+db = mysql.connect(host="localhost", user="root", passwd="",database = "iot")
 
 #* create obect with A.K.A MySQL    
 mycursor = db.cursor() 
@@ -37,8 +37,8 @@ def on_connect(client, userdata, flags, rc):
     # Subscribe Topic from here
     # Aprovechando que se conectó, hacemos un subscribe a los tópicos
     #client.subscribe("fjhp6619mxIn")
-    # recieve = client.subscribe("tc1004b/g6")
-    # client.subscribe("tc1004b/g6/control")
+    recieve = client.subscribe("tc1004b/g6")
+     #client.subscribe("tc1004b/g6/control")
 
 # Callback Function on Receiving the Subscribed Topic/Message
 # Cuando nos llega un mensaje a los tópicos suscritos, se ejecuta
@@ -64,7 +64,7 @@ def on_message(client, userdata, msg):
     device_id = m_in['device']
     sensor_id = m_in['sensor']
     valor = m_in['valor']
-
+    #print(device_id,sensor_id,valor);
     #!sends data from nodeMCU to mysql 
     mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
     db.commit()
@@ -132,3 +132,5 @@ while opc != 's':
 # al salir paramos el loop y nos desconectamos
 client.loop_stop()
 client.disconnect()
+
+
