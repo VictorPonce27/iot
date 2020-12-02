@@ -37,8 +37,8 @@ def on_connect(client, userdata, flags, rc):
     # Subscribe Topic from here
     # Aprovechando que se conectó, hacemos un subscribe a los tópicos
     #client.subscribe("fjhp6619mxIn")
-    client.subscribe("tc1004b/g6")
-    client.subscribe("tc1004b/g6/control")
+    # recieve = client.subscribe("tc1004b/g6")
+    # client.subscribe("tc1004b/g6/control")
 
 # Callback Function on Receiving the Subscribed Topic/Message
 # Cuando nos llega un mensaje a los tópicos suscritos, se ejecuta
@@ -76,18 +76,22 @@ def on_message(client, userdata, msg):
 def envia_dispositivo():
     dispositivo = input('Nombre del dispositivo:')
     sensor_actuador = input('Sensor del dispositivo:')
-    # accion = int(input('Acción:'))
-    dicSalida = {'dispositivo': dispositivo,
-                 'tipo': sensor_actuador}
+    action = int(input('Acción:'))
+    # dicSalida = {'dispositivo': dispositivo,
+    #              'tipo': sensor_actuador, 
+    #              'action': action
+    #              }
+    dicSalida = (str(dispositivo)+ str(sensor_actuador)+ str(action))
     salidaJson = json.dumps(dicSalida)
-    print('Salida Json:', salidaJson)
-    client.publish("tc1004b/g6", salidaJson)
+    # print('Salida Json:', salidaJson)
+    # client.subscribe("tc1004b/g6/control")
+    client.publish("tc1004b/g6/control", salidaJson)
+    print("message sent")
     #time.sleep(4)
 
     # #client.publish("fjhp6619mxIn",salidaJson)
 
 # Envía un mensaje de prueba para que se procese en la llegada de mensajes
-
 
 def mensaje_debug():
     salida = '{"dispositivo":"Debug1","tipo":"Debug_Tipo","dato":5}'
