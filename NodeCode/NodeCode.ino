@@ -24,7 +24,7 @@ const char* password = "Z4M8b75pS8";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 const char* topico_salida = "tc1004b/g6";
 
-const char* topico =  "tc1004b/g6/control/";
+const char* topico =  "tc1004b/g6/control";
 
 
 WiFiClient espClient;
@@ -64,9 +64,10 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char* topico, byte* payload, unsigned int length) {
+  Serial.print("callback funtion"); 
   Serial.print("Message arrived [");
-  Serial.print(topic);
+  Serial.print(topico);
   Serial.print("] ");
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
@@ -75,9 +76,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
   digitalWrite(D5, HIGH);
   delay(100);
   digitalWrite(D5, LOW);
-
+ 
                               // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1' && (char)payload[1] == '2') {
+  if ((char)payload[0] == '1' && (char)payload[1] == '2' && (char)payload[2] == '1') {
     digitalWrite(D6, HIGH);   // Turn the LED on (Note that LOW is the voltage level
                               // but actually the LED is on; this is because
                               // it is active low on the ESP-01). No es cierto en D6.
@@ -100,7 +101,7 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
 
-      client.subscribe(topico_salida);
+      client.subscribe(topico);
 //      client.publish(topico_salida, "hello world");      
 
      
@@ -149,12 +150,12 @@ void setup() {
 void proceso1() {
   int sensor_id  = 1; 
   float t = dht.readTemperature();
-  Serial.print("Temperatura: "); 
-  Serial.println(t);
+//  Serial.print("Temperatura: "); 
+//  Serial.println(t);
 
     snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, t);
 
-  Serial.println(msg);
+//  Serial.println(msg);
   client.publish(topico_salida, msg);   
 }
 
@@ -171,7 +172,7 @@ void proceso2() {
 
     snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%d}",sensor_id, ((1024-analog_in)*100)/(1024-50));
 
-  Serial.println(msg);
+//  Serial.println(msg);
 
   client.publish(topico_salida, msg);                                   
 }
@@ -187,7 +188,7 @@ void proceso4() {
   float h = dht.readHumidity();
   snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, h);
 
-  Serial.println(msg);
+//  Serial.println(msg);
   client.publish(topico_salida, msg);   
 }
   
