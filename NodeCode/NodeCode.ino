@@ -97,7 +97,7 @@ void callback(char* topico, byte* payload, unsigned int length) {
    
     Serial.print("turned off");
     digitalWrite(D6, HIGH);    // Turn the LED off by making the voltage HIGH
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.c\",\"value\":%.c,\"user\":.i,\"action\":\"2\"}",(sens),(user),(state));
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.c\",\"value\":%.c,\"user\":%.i,\"action\":\"2\"}",(sens),(user),(state));
     Serial.print(msg); 
     client.publish(topico_salida, msg); 
   }
