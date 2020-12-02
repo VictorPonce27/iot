@@ -35,14 +35,16 @@ def on_message(client, userdata, msg):
     topic = msg.topic
     m_decode = str(msg.payload.decode("utf-8", "ignore"))
     print(m_decode); 
+    print("before m_in")
     m_in = json.loads(m_decode)
 
 # Checar si el tópico es el que deseamos
 # Para Debug: iprimimos lo que generamosdata
 # Aquí es donde podemos almacenar en la BD la información
 # que envía el dispositivo
-    function =  m_in['function']
-    if(function == 1)
+    action =  m_in['action']
+
+    if(action == 1):
         device_id = m_in['device']
         sensor_id = m_in['sensor']
         valor = m_in['valor']
