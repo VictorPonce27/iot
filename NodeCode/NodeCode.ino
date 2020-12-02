@@ -83,12 +83,12 @@ void callback(char* topico, byte* payload, unsigned int length) {
   
                               // Switch on the LED if an 1 was received as first character
   if (disp == '1' && sens == '2' && state == '1') {
-    Serial.print("turned off");
+    Serial.print("turned on");
     digitalWrite(D6, LOW);   // Turn the LED on (Note that LOW is the voltage level
                               // but actually the LED is on; this is because
                               // it is active low on the ESP-01). No es cierto en D6.
   } else if (disp == '1' && sens == '2' && state == '2'){
-    Serial.print("turned on");
+    Serial.print("turned off");
     digitalWrite(D6, HIGH);    // Turn the LED off by making the voltage HIGH
   }
 
