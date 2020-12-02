@@ -81,17 +81,24 @@ void callback(char* topico, byte* payload, unsigned int length) {
   char sens = ((char)payload[2]); 
   char state = ((char)payload[3]); 
   char user = ((char)payload[4]); 
+
+  Serial.println(sens); 
+  Serial.println(state); 
+  
                               // Switch on the LED if an 1 was received as first character
   if (disp == '1' && sens == '2' && state == '1') {
     Serial.print("turned on");
     digitalWrite(D6, LOW);  
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"value\":%.i,\"user\":%.i,\"action\":\"2\"}",sens,state,user);
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.c\",\"value\":%.c,\"user\":%1,\"action\":\"2\"}",(sens),(state));
+    Serial.print(msg); 
     client.publish(topico_salida, msg); 
     
   } else if (disp == '1' && sens == '2' && state == '2'){
+   
     Serial.print("turned off");
     digitalWrite(D6, HIGH);    // Turn the LED off by making the voltage HIGH
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"value\":%.i,\"user\":%.i,\"action\":\"2\"}",sens,state,user);
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.c\",\"value\":%.c,\"user\":1,\"action\":\"2\"}",(sens),(state));
+    Serial.print(msg); 
     client.publish(topico_salida, msg); 
   }
   //  Serial.println(msg);
