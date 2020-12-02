@@ -91,7 +91,7 @@ void callback(char* topico, byte* payload, unsigned int length) {
     Serial.print("turned off");
     digitalWrite(D6, HIGH);    // Turn the LED off by making the voltage HIGH
   }
-  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"state\":%.2f,\"action\":\"2}",sensor_id, t);
+  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"state\":%.i,\"user\":%.i,\"action\":\"2}",sens,state,user);
 
 //  Serial.println(msg);
   client.publish(topico_salida, msg);   
@@ -178,7 +178,7 @@ void proceso2() {
     digitalWrite(D2,LOW); 
   }
 
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%d,\"action\":\"2}",sensor_id, ((1024-analog_in)*100)/(1024-50));
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%d,\"action\":\"1}",sensor_id, ((1024-analog_in)*100)/(1024-50));
 
 //  Serial.println(msg);
 
@@ -194,7 +194,7 @@ void proceso3() {
 void proceso4() {
   int sensor_id = 3; 
   float h = dht.readHumidity();
-  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f,\"action\":\"2}",sensor_id, h);
+  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f,\"action\":\"1}",sensor_id, h);
 
 //  Serial.println(msg);
   client.publish(topico_salida, msg);   

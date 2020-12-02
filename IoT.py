@@ -11,34 +11,13 @@ db = mysql.connect(host="localhost", user="root", passwd="root",database = "iot"
 #* create obect with A.K.A MySQL    
 mycursor = db.cursor() 
 
-#function to turn lights on in the IoT
-# def light_switch(value, device):
-#     print("the device:" + device + "has a value of: " +
-#           value + "What would you like to do")
-#     choice = input("Would you like to turn on[Y/N]")
-#     while(choice.upper() != Y or N):
-#         print("please type a valid answer")
-#         choice = input("Would you like to turn on[Y/N]")
-#     if(choice.upper() == Y):
-#         user = input("what is your user_id")
-#         mycursor.execute("SELECT user_id from home")
-#         check_user  = mycursor.fetchall()
-#         if(user == check_user): 
-#             dicSalida = {'user': check_user,'acction': 1}
-#             salidaJson = json.dumps(dicSalida)
-#             print("you have turned the lights on from device: " + device)
-#             client.publish("tc1004b/g6/control", salidaJson)
-#     else:
-#         print("no action will be taken")
-
 # Callback Function on Connection with MQTT Server
 def on_connect(client, userdata, flags, rc):
     print("Connected with Code :" + str(rc))
     # Subscribe Topic from here
     # Aprovechando que se conectó, hacemos un subscribe a los tópicos
     #client.subscribe("fjhp6619mxIn")
-    # recieve = client.subscribe("tc1004b/g6")
-    # client.subscribe("tc1004b/g6/control")
+    client.subscribe("tc1004b/g6")
 
 # Callback Function on Receiving the Subscribed Topic/Message
 # Cuando nos llega un mensaje a los tópicos suscritos, se ejecuta
@@ -55,19 +34,31 @@ def on_message(client, userdata, msg):
     current_time = (dt.now() - timedelta(1)).strftime('%Y-%m-%d %H:%M:%S.%f')
     topic = msg.topic
     m_decode = str(msg.payload.decode("utf-8", "ignore"))
+    print(m_decode); 
     m_in = json.loads(m_decode)
 
 # Checar si el tópico es el que deseamos
 # Para Debug: iprimimos lo que generamosdata
 # Aquí es donde podemos almacenar en la BD la información
 # que envía el dispositivo
-    device_id = m_in['device']
-    sensor_id = m_in['sensor']
-    valor = m_in['valor']
+    function =  m_in['function']
+    if(function == 1)
+        device_id = m_in['device']
+        sensor_id = m_in['sensor']
+        valor = m_in['valor']
+        mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
+        db.commit()
+    else:
+        user_id = m_in['user']
+        device_id = m_in['device']
+        sensor_id = m_in['sensor']
+        room_id = device_id
+        value = m_in['value']
+        mycursor.execute("INSERT INTO changes(user_id, device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s,%s)",(user_id,device_id,sensor_id,valor,current_time))   
+        db.commit()
+
 
     #!sends data from nodeMCU to mysql 
-    mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
-    db.commit()
     
 # En esta función pedimos datos al usuario para saber a qué 
 # dispositivo vamos a enviar el mensaje y lo formatemos a json
@@ -77,19 +68,12 @@ def envia_dispositivo():
     dispositivo = input('Nombre del dispositivo:')
     sensor_actuador = input('Sensor del dispositivo:')
     action = int(input('Acción:'))
-    # dicSalida = {'dispositivo': dispositivo,
-    #              'tipo': sensor_actuador, 
-    #              'action': action
-    #              }
+    user = int(input('user:  '))
     dicSalida = (str(dispositivo)+ str(sensor_actuador)+ str(action))
     salidaJson = json.dumps(dicSalida)
-    # print('Salida Json:', salidaJson)
-    # client.subscribe("tc1004b/g6/control")
+
     client.publish("tc1004b/g6/control", salidaJson)
     print("message sent")
-    #time.sleep(4)
-
-    # #client.publish("fjhp6619mxIn",salidaJson)
 
 # Envía un mensaje de prueba para que se procese en la llegada de mensajes
 
@@ -105,12 +89,13 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 # Hacemos la conexión al Broker
+
 client.connect("broker.mqtt-dashboard.com", port=1883)
+
 # Las siguientes instrucciones son para el caso que requiera password
 # client.username_pw_set("setsmjwc", "apDnKqHRgAjA")
 # y para ejecutar un loop forever, nosotros haremos un loop_start()
 # solamente
-# client.loop_forever()
 # Iniciamos el ciclo del cliente MQTT
 # Por lo que se va a conectar y le damos tres segundos
 client.loop_start()
