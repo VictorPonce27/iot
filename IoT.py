@@ -34,9 +34,11 @@ def on_message(client, userdata, msg):
     current_time = (dt.now() - timedelta(1)).strftime('%Y-%m-%d %H:%M:%S.%f')
     topic = msg.topic
     m_decode = str(msg.payload.decode("utf-8", "ignore"))
-    print(m_decode); 
-    print("before m_in")
+    
+    # print(m_decode)
+
     m_in = json.loads(m_decode)
+
 
 # Checar si el tópico es el que deseamos
 # Para Debug: iprimimos lo que generamosdata
@@ -44,19 +46,21 @@ def on_message(client, userdata, msg):
 # que envía el dispositivo
     action =  m_in['action']
 
-    if(action == 1):
+    if(action == '1'):
         device_id = m_in['device']
         sensor_id = m_in['sensor']
         valor = m_in['valor']
-        mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
+        mycursor.execute("INSERT INTO data(device_id, sensor_id, value, time) VALUES (%s,%s,%s,%s)",(device_id,sensor_id,valor,current_time))   
         db.commit()
-    else:
-        user_id = m_in['user']
-        device_id = m_in['device']
-        sensor_id = m_in['sensor']
+    elif (action == '2'):
+        print("here things go wrong")
+        print(m_in)
+        user_id = int(m_in['user'])
+        device_id = int(m_in['device'])
         room_id = device_id
-        value = m_in['value']
-        mycursor.execute("INSERT INTO changes(user_id, device_id, sensor_id, value, time) VALUE (%s,%s,%s,%s,%s)",(user_id,device_id,sensor_id,valor,current_time))   
+        actuator_id = int(m_in['sensor'])
+        valor = int(m_in['value'])
+        mycursor.execute("INSERT INTO changes(user_id, device_id, actuator_id, room_id, value, date) VALUES (%s,%s,%s,%s,%s,%s)",(user_id,device_id,actuator_id,room_id,valor,current_time))   
         db.commit()
 
 
@@ -69,9 +73,9 @@ def on_message(client, userdata, msg):
 def envia_dispositivo():
     dispositivo = input('Nombre del dispositivo:')
     sensor_actuador = input('Sensor del dispositivo:')
-    action = int(input('Acción:'))
-    user = int(input('user:  '))
-    dicSalida = (str(dispositivo)+ str(sensor_actuador)+ str(action))
+    action = int(input('action:'))
+    user = int(input('user: '))
+    dicSalida = (str(dispositivo)+ str(sensor_actuador)+ str(action) + str(user))
     salidaJson = json.dumps(dicSalida)
 
     client.publish("tc1004b/g6/control", salidaJson)
