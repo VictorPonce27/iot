@@ -1,4 +1,9 @@
 
+
+
+
+
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <NTPClient.h>
@@ -19,18 +24,19 @@ NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
 
 // Update these with values suitable for your network.
 
-const char* ssid = "INFINITUME7A2_2.4";
-const char* password = "Z4M8b75pS8";
+
+const char* ssid = "Totalplay-Americas.";
+const char* password = "conectateal221";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 const char* topico_salida = "tc1004b/g6";
+const char* topico = "tc1004b/g6/control";
 
-const char* topico =  "tc1004b/g6/control";
 
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 unsigned long lastMsg = 0;
-#define MSG_BUFFER_SIZE	(80)
+#define MSG_BUFFER_SIZE  (80)
 char msg[MSG_BUFFER_SIZE];
 int value = 0;
 
@@ -82,14 +88,14 @@ void callback(char* topico, byte* payload, unsigned int length) {
   char state = ((char)payload[3]); 
   
                               // Switch on the LED if an 1 was received as first character
-  if (disp == '1' && sens == '2' && state == '1') {
+  if (disp == '5' && sens == '2' && state == '1') {
     Serial.print("turned on");
-    digitalWrite(D6, LOW);   // Turn the LED on (Note that LOW is the voltage level
+    digitalWrite(D6, HIGH  );   // Turn the LED on (Note that LOW is the voltage level
                               // but actually the LED is on; this is because
                               // it is active low on the ESP-01). No es cierto en D6.
-  } else if (disp == '1' && sens == '2' && state == '2'){
+  } else if (disp == '5' && sens == '2' && state == '2'){
     Serial.print("turned off");
-    digitalWrite(D6, HIGH);    // Turn the LED off by making the voltage HIGH
+    digitalWrite(D6, LOW);    // Turn the LED off by making the voltage HIGH
   }
 
 }
@@ -154,19 +160,19 @@ void setup() {
 }
 
 void proceso1() {
-  int sensor_id  = 1; 
+  int sensor_id  = 13; 
   float t = dht.readTemperature();
 //  Serial.print("Temperatura: "); 
 //  Serial.println(t);
 
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, t);
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"5\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, t);
 
 //  Serial.println(msg);
   client.publish(topico_salida, msg);   
 }
 
 void proceso2() {
-  int sensor_id = 2; 
+  int sensor_id = 14; 
   const int analog_p = A0; 
   unsigned int analog_in = analogRead(analog_p);
   if(analog_in > 600){
@@ -176,7 +182,7 @@ void proceso2() {
     digitalWrite(D2,LOW); 
   }
 
-    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%d}",sensor_id, ((1024-analog_in)*100)/(1024-50));
+    snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"5\",\"sensor\":\"%.i\",\"valor\":%d}",sensor_id, ((1024-analog_in)*100)/(1024-50));
 
 //  Serial.println(msg);
 
@@ -187,12 +193,12 @@ void proceso3() {
 //  int count = 1; 
   timeClient.update();
 }
-
+  
 
 void proceso4() {
-  int sensor_id = 3; 
+  int sensor_id = 15; 
   float h = dht.readHumidity();
-  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"1\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, h);
+  snprintf (msg, MSG_BUFFER_SIZE, "{\"device\":\"5\",\"sensor\":\"%.i\",\"valor\":%.2f}",sensor_id, h);
 
 //  Serial.println(msg);
   client.publish(topico_salida, msg);   
@@ -213,5 +219,7 @@ void loop() {
   if (now - ciclo3 > 10000) {ciclo3 = now;proceso3();}
   if (now - ciclo4 > 10000) {ciclo4 = now;proceso4();}
 
+
+}
 
 }
